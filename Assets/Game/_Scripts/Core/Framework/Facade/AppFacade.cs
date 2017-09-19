@@ -11,7 +11,7 @@ public enum AppEvent
     checkNeedRendering,
 
 }
-public class AppFacade :Facade 
+public sealed class AppFacade :Facade 
 {
 
     #region 变量
@@ -22,13 +22,17 @@ public class AppFacade :Facade
     private AppFacade() :base()
     { }
     #endregion
+    /// <summary>
+    /// app启动
+    /// 1，启动框架
+    /// 2，更新app配置信息（所有资源配置信息）
+    /// </summary>
     public override void StartUp()
     {
         base.StartUp();  
-        //更新资源
-        AppFacade.Ins.GetMgr<ResourceManager>().UpdateAssets(result => {
-            Dispath(AppEvent.resLoadOver, result);  //消息通知出去
-        });
     }
-
+    public void StartGame(string gname)
+    {
+        GetMgr<GameManager>().GetGame(gname).StartUp();
+    }
 }

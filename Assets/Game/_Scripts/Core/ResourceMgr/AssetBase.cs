@@ -12,7 +12,7 @@ namespace SimpleFramework
     public class AssetBase 
     {
         private AssetbundleConfig abConfig;
-        private AssetBundleLoader loader;
+      //  private AssetBundleLoader loader;
         protected GameAssetConfig gameAssetConfig;
         private AssetVersion curAssetVersion;
         protected Dictionary<string, Object> gloabalSourceDic;   //全局的 完整生命周期
@@ -36,7 +36,7 @@ namespace SimpleFramework
                 Debug.Log("本地资源版本号：" + curAssetVersion.assetVersion);
             //    AppFacade.Ins.Log(BugType.log, "本地资源版本号"+ curAssetVersion.assetVersion);
             }
-            loader = new AssetBundleLoader();
+           // loader = new AssetBundleLoader();
         }
         //资源初始化
         protected void AssetsInit(System.Action<bool> whenOver)
@@ -127,7 +127,7 @@ namespace SimpleFramework
                 Debug.Log("load from resource:" + assetName);
                 callback(ResourcesLoad(assetName)); return;
             }
-            loader.LoadFromStreamAssetsPathSync(fullname, (AssetBundle ab) =>
+            AssetBundleLoader.LoadFromStreamAssetsPathSync(fullname, (AssetBundle ab) =>
             {
                 try
                 {
@@ -143,7 +143,6 @@ namespace SimpleFramework
                             if (obs[i].name.Equals(assetName, System.StringComparison.OrdinalIgnoreCase))
                             {
                                 oo = obs[i];
-                                bindScripts(oo);
                             }
                         }
                         Debug.Log("load resource from assetsbundle");
@@ -153,24 +152,6 @@ namespace SimpleFramework
                 }
                 catch (System.Exception ex) { Debug.LogError(ex); }
             });
-        }
-        /// <summary>
-        /// 绑定物体上所有脚本关系
-        /// </summary>
-        /// <param name="rootObjName"></param>
-        void bindScripts(Object rootObj)
-        {
-            AssetScriptsMgr.AssetScriptRelationship relation = AssetScriptsMgr.getIns().getAssetScriptRelationship(rootObj.name);
-            if (relation != null)
-                relation.BindScripts(rootObj);
-            else
-            {
-                Debug.Log("no relationship on this obj:" + rootObj.name);
-            }
-        }
-        void loadScript(string name, System.Action<Object> callback)
-        {
-
         }
 
         bool checkUpdate()
@@ -192,12 +173,12 @@ namespace SimpleFramework
             Debug.Log("assetversion1:" + newAsset.ToStr() + "old kkkk:" + curAssetVersion.ToStr());
             AssetVersion.CompareAndGetUpdateList(curAssetVersion, newAsset, out updateList);
             //更新总的依赖文件
-            loader.UpdateManifestFromServer(AssetBundleInfo.assetPath_server, (AssetBundleManifest am) =>
+            AssetBundleLoader.UpdateManifestFromServer(AssetBundleInfo.assetPath_server, (AssetBundleManifest am) =>
             {
                 Debug.Log("服务器更新了manifest"); AssetBundleInfo.SetManifest(am);
                 if (updateList != null)
                 {
-                    loader.UpdateFromServer(AssetBundleInfo.assetPath_server, updateList, whenDownloadOver);
+                    AssetBundleLoader.UpdateFromServer(AssetBundleInfo.assetPath_server, updateList, whenDownloadOver);
                 }
                 else
                 {
@@ -218,11 +199,11 @@ namespace SimpleFramework
             string VersionPath = AssetBundleInfo.assetPath_server + "/" + "assetVersionInfo.txt";      //资源版本信息
             string ConfigPath = AssetBundleInfo.assetPath_server + "/" + "abConfig.txt";               //资源包配置信息
             string GameAssetConfigPath = AssetBundleInfo.assetPath_server + "/" + "gameAssetConfig.txt";  //游戏资源预加载信息
-            loader.LoadFileFromServer(GameAssetConfigPath, (string str0) => {
+            AssetBundleLoader.LoadFileFromServer(GameAssetConfigPath, (string str0) => {
                 gameAssetConfig = GameAssetConfig.FromStr(str0);
-                loader.LoadFileFromServer(ConfigPath, (string str) => {
+                AssetBundleLoader.LoadFileFromServer(ConfigPath, (string str) => {
                     Debug.Log("config file download"); abConfig = AssetbundleConfig.FromStr(str);
-                    loader.LoadFileFromServer(VersionPath, (string str1) => {
+                    AssetBundleLoader.LoadFileFromServer(VersionPath, (string str1) => {
                         AssetVersion av = AssetVersion.FromString(str1);
                         if (back != null) back(av);
                     });

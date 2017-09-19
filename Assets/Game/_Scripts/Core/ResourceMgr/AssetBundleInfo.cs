@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using SimpleFramework.Game;
+using System.IO;
+
 namespace SimpleFramework
 {
     public class AssetBundleInfo
@@ -30,25 +33,120 @@ namespace SimpleFramework
                     return Application.platform.ToString();
             }
         }
-        private static AssetBundleManifest _manifest = null;
-        public static AssetBundleManifest Manifest
+
+
+    }
+    /// <summary>
+    /// 
+    /// </summary>
+    public static class AssetBundleHelp
+    {
+        /// <summary>
+        /// 获取AssetVersion的存放路径
+        /// </summary>
+        /// <returns></returns>
+        public static string GetAssetVersionPath(string gamename = "")
         {
-            get
+            if (gamename == "")   //全局
+                return "assetVersionInfo.txt";
+            return gamename + "/" + "assetVersionInfo.txt";
+        }
+        /// <summary>
+        /// 获取abconfig的存放路径
+        /// </summary>
+        /// <param name="gamename"></param>
+        /// <returns></returns>
+        public static string GetAbConfigPath(string gamename = "")
+        {
+            if (gamename == "")
+                return "abConfig.txt";
+            else return gamename + "/" + "abConfig.txt";
+        }
+        /// <summary>
+        /// 获取游戏资源配置路径
+        /// </summary>
+        /// <param name="gamename"></param>
+        /// <returns></returns>
+        public static string GetGameassetConfigPath(string gamename = "")
+        {
+            if (gamename == "")
+                return "gameAssetConfig.txt";
+            else return gamename + "/" + "gameAssetConfig.txt";
+        }
+        public static AssetVersion LoadAssetVersion(string gamename = "")
+        {
+            string fullpath = Path.Combine(AssetBundleInfo.assetPath_local, GetAssetVersionPath(gamename));
+            string text = "";
+            if (File.Exists(fullpath))
             {
-                if (_manifest == null)
+                StreamReader sr = File.OpenText(fullpath);
+                text = sr.ReadToEnd();
+                sr.Close();
+            }
+            else
+            {
+                fullpath = Path.Combine(AssetBundleInfo.curPlatformFloder, GetAssetVersionPath(gamename));
+                Debug.Log("fullpath:" + fullpath);
+                TextAsset ta = Resources.Load<TextAsset>(fullpath);
+                if (ta == null)
                 {
-                    AssetBundle ab = AssetBundle.LoadFromFile(assetPath_local + "/" + curPlatformFloder);
-                    if (ab != null) _manifest = ab.LoadAsset("AssetBundleManifest") as AssetBundleManifest;
-                    if (_manifest == null) Debug.LogError("manifest wei kong");
-                    ab.Unload(false);
+                    Debug.LogError("not find AssetVersionInfo at resource dir");
+                    return null;
                 }
-                return _manifest;
+                text = ta.text;
+            }
+            return AssetVersion.FromString(text);
+        }
+        public static AssetbundleConfig LoadABConfig(string gamename = "")
+        {
+            string fullpath = Path.Combine(AssetBundleInfo.assetPath_local, GetAbConfigPath(gamename));
+            fullpath = fullpath.Replace("/", "\\");
+            if (File.Exists(fullpath))
+            {
+                StreamReader sr = File.OpenText(fullpath);
+                string text = sr.ReadToEnd();
+                sr.Close();
+                return AssetbundleConfig.FromStr(text);
+            }
+            else
+            {
+                fullpath = Path.Combine(AssetBundleInfo.curPlatformFloder, GetAbConfigPath(gamename));// "/abConfig";
+                Debug.Log("fullpath:" + fullpath);
+                TextAsset ta = Resources.Load<TextAsset>(fullpath);
+                if (ta == null)
+                {
+                    Debug.LogError("not find abConfig at resource dir");
+                    return null;
+                }
+                return AssetbundleConfig.FromStr(ta.text);
             }
         }
-        public static void SetManifest(AssetBundleManifest am)
+        public static GameAssetConfig LoadGameAssetConfig(string gamename = "")
         {
-            _manifest = am;
+            string fullpath = GetGameassetConfigPath(gamename);
+            fullpath = fullpath.Replace("/", "\\");
+            if (File.Exists(fullpath))
+            {
+                StreamReader sr = File.OpenText(fullpath);
+                string text = sr.ReadToEnd();
+                sr.Close();
+                return GameAssetConfig.FromStr(text);
+            }
+            else
+            {
+                GameAssetConfig gac = null;
+                TextAsset ta = Resources.Load<TextAsset>(fullpath) as TextAsset;
+                if (ta != null)
+                {
+                    Debug.Log("textasset config is not null:" + ta.text);
+                    gac = GameAssetConfig.FromStr(ta.text);
+                }
+                if (gac == null)
+                    Debug.LogError("GameAssetConfig file is not exsit!");
+                return gac;
+            }
         }
+
     }
     public class AssetbundleConfig
     {

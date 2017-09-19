@@ -5,38 +5,34 @@ using System.Collections.Generic;
 
 namespace SimpleFramework
 {
-    public class AssetBundleLoader
+    public static class AssetBundleLoader
     {
-        public AssetBundleLoader()
-        {
-            rememberList = new List<string>();
-        }
-        public void LoadFromStreamAssetsPathSync(string abfullpath, System.Action<AssetBundle> callback)
+        public static void LoadFromStreamAssetsPathSync(string abfullpath, System.Action<AssetBundle> callback)
         {
             if (!File.Exists(abfullpath)) return;
             LoadAssetbundleSync(abfullpath, callback);
         }
-        public void LoadFileFromServer(string url, System.Action<string> result)
+        public static void LoadFileFromServer(string url, System.Action<string> result)
         {
             AppFacade.Ins.gMono.StartCoroutine(loadFileSync(url, result));
         }
         // 从StreamingAssetsPath异步加载
-        public void LoadFromStreamingAssetsPathAsync(string assetbundle, System.Action<AssetBundle> callback)
+        public static void LoadFromStreamingAssetsPathAsync(string assetbundle, System.Action<AssetBundle> callback)
         {
             LoadAssetbundleAsync(AssetBundleInfo.assetPath_local + "/" + assetbundle, callback);
         }
         // PersistantDataPath异步加载
-        public void LoadFromPersistantDataPathAsync(string assetbundle, System.Action<AssetBundle> callback)
+        public static void LoadFromPersistantDataPathAsync(string assetbundle, System.Action<AssetBundle> callback)
         {
             LoadAssetbundleAsync(UnityEngine.Application.persistentDataPath + "/" + assetbundle, callback);
         }
         //从服务器更新资源包
-        public void UpdateFromServer(string urlpath, Dictionary<string, Hash128> downloadList, System.Action<bool> downloadOver = null)
+        public static void UpdateFromServer(string urlpath, Dictionary<string, Hash128> downloadList, System.Action<bool> downloadOver = null)
         {
             AppFacade.Ins.gMono.StartCoroutine(downloadAssetbundle(urlpath, downloadList, downloadOver));
         }
         //更新manifest
-        public void UpdateManifestFromServer(string url, System.Action<AssetBundleManifest> manifestCallback)
+        public static void UpdateManifestFromServer(string url, System.Action<AssetBundleManifest> manifestCallback)
         {
             url = url.Replace("\\", "/");
             string manifest = url.Substring(url.LastIndexOf("/") + 1);
@@ -48,7 +44,7 @@ namespace SimpleFramework
             }));
         }
         // 协程实现
-        IEnumerator<YieldInstruction> LoadAsyncCoroutine(string path, System.Action<AssetBundle> callback)
+        static IEnumerator<YieldInstruction> LoadAsyncCoroutine(string path, System.Action<AssetBundle> callback)
         {
             AssetBundleCreateRequest abcr = AssetBundle.LoadFromFileAsync(path);
             yield return abcr;
@@ -57,8 +53,8 @@ namespace SimpleFramework
 
             callback(abcr.assetBundle);
         }
-        private static List<string> rememberList = new List<string>();
-        AssetBundle LoadSyncCoroutine(string path)
+     //   private static List<string> rememberList = new List<string>();
+        static AssetBundle LoadSyncCoroutine(string path)
         {
             Debug.Log("path - " + path);
 
@@ -82,7 +78,7 @@ namespace SimpleFramework
             }
             return ab;
         }
-        void LoadFromFileDependices(string fullname)
+        static void LoadFromFileDependices(string fullname)
         {
             string dir = fullname.Substring(0, fullname.LastIndexOf('/')) + "/";
             string filename = fullname.Substring(fullname.LastIndexOf('/') + 1);
@@ -95,11 +91,11 @@ namespace SimpleFramework
             }
             ab.LoadAllAssets();
         }
-        void LoadAssetbundleSync(string assetbundlePath, System.Action<AssetBundle> callback)
+        static void LoadAssetbundleSync(string assetbundlePath, System.Action<AssetBundle> callback)
         {
             callback(LoadSyncCoroutine(assetbundlePath));
         }
-        IEnumerator<YieldInstruction> loadFileSync(string url, System.Action<string> callback)
+        static IEnumerator<YieldInstruction> loadFileSync(string url, System.Action<string> callback)
         {
             WWW www = new WWW(url);
             //   WWW www = new WWW(@url);
@@ -113,11 +109,11 @@ namespace SimpleFramework
             saveAsset(filename, www.bytes);
             if (callback != null) callback(www.text);
         }
-        void LoadAssetbundleAsync(string finalPath, System.Action<UnityEngine.AssetBundle> callback)
+        static void LoadAssetbundleAsync(string finalPath, System.Action<UnityEngine.AssetBundle> callback)
         {
             //  GameLogic.Ins.StartCoroutine(LoadAsyncCoroutine(finalPath, callback));
         }
-        IEnumerator<YieldInstruction> downloadAssetbundle1(string path, Dictionary<string, Hash128> downloadList, System.Action<bool> downloadOver = null)
+        static IEnumerator<YieldInstruction> downloadAssetbundle1(string path, Dictionary<string, Hash128> downloadList, System.Action<bool> downloadOver = null)
         {
             string pathex = "file:///" + path + "/";
             bool isSuccess = false;
@@ -165,7 +161,7 @@ namespace SimpleFramework
             if (downloadOver != null)
                 downloadOver(isSuccess);
         }
-        IEnumerator<YieldInstruction> downloadAssetbundle(string path, Dictionary<string, Hash128> downloadList, System.Action<bool> downloadOver = null)
+        static IEnumerator<YieldInstruction> downloadAssetbundle(string path, Dictionary<string, Hash128> downloadList, System.Action<bool> downloadOver = null)
         {
             WWW www = null;
             string pathex = path + "/";
@@ -205,7 +201,7 @@ namespace SimpleFramework
             if (downloadOver != null)
                 downloadOver(isSuccess);
         }
-        IEnumerator<YieldInstruction> downloadManifest(string filename, System.Action<AssetBundleManifest> manifestCallback)
+        static IEnumerator<YieldInstruction> downloadManifest(string filename, System.Action<AssetBundleManifest> manifestCallback)
         {
             filename = filename.Replace("\\", "/");
             using (WWW www = new WWW(@filename))
@@ -228,7 +224,7 @@ namespace SimpleFramework
                 }
             }
         }
-        void saveAsset(string name, byte[] bytes)
+        static void saveAsset(string name, byte[] bytes)
         {
             name = name.Replace("\\", "/");
             string path = AssetBundleInfo.assetPath_local + "/" + name;

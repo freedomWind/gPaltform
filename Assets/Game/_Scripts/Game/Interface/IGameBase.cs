@@ -5,6 +5,8 @@ using UnityEngine.SceneManagement;
 using System.Reflection;
 using System;
 using UnityEngine.AI;
+using SimpleFramework.Event;
+using SimpleFramework.Asset;
 
 namespace SimpleFramework.Game
 {
@@ -17,7 +19,7 @@ namespace SimpleFramework.Game
         type3,
     }
     //游戏枚举
-    public class GameEnum
+    public struct GameEnum
     {
         public const string mainLobby = "game_mainLobby";
         public const string SeaFish = "game_SeaFish";
@@ -32,15 +34,18 @@ namespace SimpleFramework.Game
         public const string i = "game_i";
 
     }
+
     /// <summary>
     /// 每一个游戏demo对应一个gamebase
+    /// 游戏名字，类型,场景
+    /// 
     /// </summary>
-    public abstract class IGameBase
+    public abstract class IGameBase 
     {
         static string preGameName = "";
         internal static IGameBase NowActiveGame = null;
-        protected GameType gType { get; private set; }             //游戏类型
-        protected readonly string gameName;                         //游戏名称
+        public readonly string gameName;  //游戏名称
+        protected GameType gType { get; private set; }             //游戏类型                     
         protected abstract string[] sceneName { get; }             //游戏场景
         public IGameBase(GameType type, string name)
         {
@@ -102,9 +107,9 @@ namespace SimpleFramework.Game
         /// <param name="param"></param>
         internal void StartUp(object param = null)
         {
-            if (this == NowActiveGame) return;
-            else if (NowActiveGame != null) NowActiveGame.UnLoad();          
-            //   else  NowActiveGame?.UnLoad();    //unity版本得支持c#4.0以上
+            if (this == NowActiveGame) return;         
+            NowActiveGame?.UnLoad();    //unity版本得支持c#4.0以上
+            AppFacade.Ins.GetMgr<EventManager>().Dispath(new EventArg(eApp.eReadyLoadGame));
             NowActiveGame = this;
             LoadScene(0);
             OnStartUp(param);
@@ -113,19 +118,43 @@ namespace SimpleFramework.Game
         //启动回调
         protected virtual void OnStartUp(object param = null)
         {
-
+            AppFacade.Ins.GetMgr<EventManager>().Dispath(new EventArg(eApp.eOverLoadGame));
         }
         //卸载
         internal void UnLoad()
         {
             preGameName = gameName;
             Debug.Log("卸载游戏" + gameName);
-            UnRegiestScene();
+            UnRegiestScene();                  //场景卸载
             OnUnLoad();
         }
         //卸载回调
         protected virtual void OnUnLoad()
         {
+            AppFacade.Ins.GetMgr<EventManager>().Dispath(new EventArg(eApp.eOverUnLoadGame));
         }
+    }
+    /// <summary>
+    /// 游戏加载接口
+    /// 约定游戏加载过程
+    /// 1，检查更新
+    /// 2，更新
+    /// 3，解压
+    /// 4，预加载
+    /// 5，进入游戏场景  （首次进入游戏时，不要同时出现加载页面和loading场景）
+    /// </summary>
+    public abstract class IGameLoader
+    {
+        private IAssetsLoader assetsLoader;
+        public void SetAssetsLoader(IGameAssetsLoader loader)
+        {
+            this.assetsLoader = loader;
+        }
+    }
+    public interface IGameLoader
+    {
+        void PullFromServer();
+        void PreLoad();
+        void UnLoad();
     }
 }

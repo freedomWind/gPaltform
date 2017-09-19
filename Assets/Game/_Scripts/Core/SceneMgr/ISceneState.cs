@@ -84,7 +84,7 @@ namespace SimpleFramework
 
         private void LoadScene(string loadSceneName)
         {
-            AppFacade.Ins.Dispath(mEvent.readySwitchNotify, loadSceneName);
+          //  AppFacade.Ins.Dispath(mEvent.readySwitchNotify, loadSceneName);
             Debug.Log("开始切换场景：" + loadSceneName);
             LoadingView.loadingScene = loadSceneName;
             LoadingView.OnLoadingOver = OnLoadOver;

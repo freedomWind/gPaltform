@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine;
+using SimpleFramework.Event;
 
 public class BoatChecking : MonoBehaviour {
 
@@ -19,7 +20,8 @@ public class BoatChecking : MonoBehaviour {
             curTime = Time.time;
             string wIndex = "";
             AIMapTest.Instance?.CheckRenderingState(transform.localPosition,out wIndex);
-            AppFacade.Ins.Dispath(vBoatEvent.vBoatState, new object[] { transform.localPosition, transform.localEulerAngles, wIndex });   //往外更新信息
+            //AppFacade.Ins.Dispath(vBoatEvent.vBoatState, new object[] { transform.localPosition, transform.localEulerAngles, wIndex });   //往外更新信息
+            AppFacade.Ins.GetMgr<EventManager>().Dispath(new EventArg(vBoatEvent.vBoatState, new vBoatState(transform.localPosition, transform.localEulerAngles, wIndex)));
         }
 	}
 }

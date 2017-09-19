@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Reflection;
 using SimpleFramework.Game;
+using SimpleFramework.Event;
+
 namespace SimpleFramework
 {
     public abstract class Facade
     {
         private Dictionary<string, object> managerDic;
+      //  IGameEvent
         private GlobalEntity gEntity;
         public Facade()
         {
@@ -63,20 +66,7 @@ namespace SimpleFramework
             return oo;
         }
         #endregion
-        #region 全局事件
-        public void Dispath(System.Enum e, params object[] objs)
-        {
-            gEntity.Dispath(e, objs);
-        }
-        public void AddListener(System.Enum e, EntityDel del)
-        {
-            gEntity.AddListener(e, del);
-        }
-        public void RemoveListener(System.Enum e, EntityDel del)
-        {
-            gEntity.RemoveListener(e, del);
-        }
-        #endregion
+    
         public void SendCommand()
         {
 
@@ -88,6 +78,7 @@ namespace SimpleFramework
             GetMgr<ModelManager>().Init();
             GetMgr<GameManager>();
             GetMgr<SceneMgr>();
+            GetMgr<EventManager>();
         }
     }
     public enum BugType

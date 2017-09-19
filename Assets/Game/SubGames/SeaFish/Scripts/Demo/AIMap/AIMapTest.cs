@@ -7,6 +7,16 @@ public enum vBoatEvent
 {
     vBoatState,
 }
+struct vBoatState
+{
+    public Vector3 pos;
+    public Vector3 rotate;
+    public string worldIndex;
+    public vBoatState(Vector3 v1, Vector3 v2, string index)
+    {
+        pos = v1;rotate = v2;worldIndex = index;
+    }
+}
 public class AIMapTest : MonoBehaviour {
 
     #region  test

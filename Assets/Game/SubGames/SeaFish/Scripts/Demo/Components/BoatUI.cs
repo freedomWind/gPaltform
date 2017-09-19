@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using SimpleFramework.Event;
 
 public class BoatUI : MonoBehaviour
 {
@@ -13,12 +14,12 @@ public class BoatUI : MonoBehaviour
     private void Start()
     {
         Debug.LogError("warning");
-        AppFacade.Ins.AddListener(vBoatEvent.vBoatState, UpdateBoatState);
+        AppFacade.Ins.GetMgr<EventManager>().AddEvent(vBoatEvent.vBoatState, UpdateBoatState);
     }
     private void OnDestroy()
     {
         Debug.LogError("whyy");
-        AppFacade.Ins.RemoveListener(vBoatEvent.vBoatState, UpdateBoatState);
+        AppFacade.Ins.GetMgr<EventManager>().RemoveEvent(vBoatEvent.vBoatState, UpdateBoatState);
     }
     public float Speed
     {
@@ -32,15 +33,14 @@ public class BoatUI : MonoBehaviour
     {
         set { this.ui_PosAndRotate.text = value; }
     }
-    void UpdateBoatState(params object[] objs)
+    void UpdateBoatState(EventArg arg)
     {
-        Vector3 pos = (Vector3)objs[0];
-        Vector3 engel = (Vector3)objs[1];
-        string str = (string)objs[2];
-        if(str != "")
-            WorldIndex = "世界索引："+ str;
+        vBoatState bs = (vBoatState)arg.obj1;
+      
+        if(bs.worldIndex != "")
+            WorldIndex = "世界索引："+ bs.worldIndex;
         PosAndRotate = string.Format("当前位置 -- X:{0},Y:{1},Z:{2}\n当前朝向 -- X:{3},Y:{4},Z:{5}"
-            ,pos.x,pos.y,pos.z,engel.x,engel.y,engel.z);
+            ,bs.pos.x,bs.pos.y,bs.pos.z,bs.rotate.x,bs.rotate.y,bs.rotate.z);
 
     }
 }

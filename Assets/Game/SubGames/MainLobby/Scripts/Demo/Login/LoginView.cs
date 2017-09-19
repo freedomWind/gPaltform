@@ -39,11 +39,11 @@ public class LoginView : BaseView {
         //    return;
         //}
         //mEntity.Dispath(vEvent.vLogin, account.text, pwd.text);
-        mEntity.Dispath(vEvent.vLogin_wechat);
+    //    mEntity.Dispath(vEvent.vLogin_wechat);
     }
     void Login_guest()
     {
-        mEntity.Dispath(vEvent.vLogin_guest);
+     //   mEntity.Dispath(vEvent.vLogin_guest);
     }
     void ShowTip(string str)
     {

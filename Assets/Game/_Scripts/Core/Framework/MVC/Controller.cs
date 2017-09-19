@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using SimpleFramework.Game;
+using SimpleFramework.Event;
 
 namespace SimpleFramework
 {

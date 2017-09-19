@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using SimpleFramework.Game;
 using SimpleFramework;
+using SimpleFramework.Event;
 using UnityEngine.UI;
 using DG.DemiLib;
 using Joystick = UnityStandardAssets.CrossPlatformInput.Joystick;
@@ -101,7 +102,7 @@ public partial class MainControllView:BaseView
         string name = sender.name;
         if (name.Contains("skill"))
         {
-            mEntity.Dispath(vEvent.vDoSkill, name);
+            mEntity.Dispath(new EventArg(vEvent.vDoSkill,name));
         }
         else if (name.Contains("BackBtn"))
         {
