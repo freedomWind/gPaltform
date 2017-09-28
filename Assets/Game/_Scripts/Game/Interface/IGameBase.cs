@@ -151,10 +151,10 @@ namespace SimpleFramework.Game
             this.assetsLoader = loader;
         }
     }
-    public interface IGameLoader
-    {
-        void PullFromServer();
-        void PreLoad();
-        void UnLoad();
-    }
+    //public interface IGameLoader
+    //{
+    //    void PullFromServer();
+    //    void PreLoad();
+    //    void UnLoad();
+    //}
 }
